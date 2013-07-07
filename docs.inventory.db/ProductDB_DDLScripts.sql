@@ -59,17 +59,6 @@ CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_VARIATION` (
 ENGINE = InnoDB;
 
 
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`IMAGE_GROUP`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`IMAGE_GROUP` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`IMAGE_GROUP` (
-  `IMAGE_GROUP_ID` INT NOT NULL ,
-  `IMAGE_GROUP_NAME` VARCHAR(45) NULL ,
-  `SELLER_ID` INT NULL ,
-  PRIMARY KEY (`IMAGE_GROUP_ID`) )
-ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
