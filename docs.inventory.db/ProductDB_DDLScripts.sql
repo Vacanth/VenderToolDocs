@@ -1,438 +1,436 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+set @old_unique_checks=@@unique_checks, unique_checks=0;
+set @old_foreign_key_checks=@@foreign_key_checks, foreign_key_checks=0;
+set @old_sql_mode=@@sql_mode, sql_mode='traditional,allow_invalid_dates';
 
-CREATE SCHEMA IF NOT EXISTS `PRODUCTDB` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
-USE `PRODUCTDB` ;
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`MERCHANT_PRODUCT`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`MERCHANT_PRODUCT` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`MERCHANT_PRODUCT` (
-  `MERCHANT_PRODUCT_ID` BIGINT NOT NULL AUTO_INCREMENT ,
-  `TITLE` VARCHAR(256) NULL ,
-  `SKU` VARCHAR(64) NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `PRODUCT_CODE` VARCHAR(64) NULL ,
-  `PRODUCT_CODE_TYPE` TINYINT NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_APP` TINYINT NULL ,
-  PRIMARY KEY (`MERCHANT_PRODUCT_ID`) )
-AUTO_INCREMENT = 1;
-
+create schema if not exists `productdb` default character set utf8 ;
+use `productdb` ;
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_DESCRIPTION`
+-- table `productdb`.`account`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_DESCRIPTION` ;
+drop table if exists `productdb`.`account` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_DESCRIPTION` (
-  `PRODUCT_DESCRIPTION_ID` BIGINT NOT NULL ,
-  `DESCRIPTION_NAME` VARCHAR(64) NULL ,
-  `PRODUCT_ID` BIGINT NOT NULL ,
-  `DESCRIPTION_TEXT` TEXT NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  PRIMARY KEY (`PRODUCT_DESCRIPTION_ID`) ,
-  INDEX `fk_MERCHANT_PRODUCT_DESCRIPTION_MERCHANT_PRODUCT1_idx` (`PRODUCT_ID` ASC)
-  )
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`account` (
+  `account_id` bigint(20) not null auto_increment ,
+  `email_addr` varchar(128) null default null ,
+  `salt` varchar(128) null default null ,
+  `password` varchar(128) null default null ,
+  `first_name` varchar(64) null default null ,
+  `last_name` varchar(64) null default null ,
+  `middle_name` varchar(64) null default null ,
+  `account_image` blob null default null ,
+  `registration_addr_id` bigint(20) not null ,
+  `billing_addr_id` bigint(20) not null ,
+  `status` tinyint(4) null default null ,
+  `registered_country` int(11) null default null ,
+  `locale_iso3` tinyint(4) null default null ,
+  `currency_code_iso3` tinyint(4) null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` tinyint(4) null default null ,
+  primary key (`account_id`) ,
+  unique index `email_addr_unique` (`email_addr` asc) ,
+  index `fk_account_address1_idx` (`registration_addr_id` asc) ,
+  index `fk_account_address2_idx` (`billing_addr_id` asc) )
+engine = innodb
+auto_increment = 3
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_VARIATION`
+-- table `productdb`.`account_marketplace`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_VARIATION` ;
+drop table if exists `productdb`.`account_marketplace` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_VARIATION` (
-  `PRODUCT_VARIATIONS_ID` BIGINT NOT NULL ,
-  `PRODUCT_ID` BIGINT NULL ,
-  `AVAILBLE_QUANTITY` INT NULL ,
-  `PRICE` DECIMAL(18,4) NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`PRODUCT_VARIATIONS_ID`) ,
-  INDEX `fk_PRODUCT_VARIATION_MERCHANT_PRODUCT1_idx` (`PRODUCT_ID` ASC) )
-ENGINE = InnoDB;
-
-
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`IMAGE`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`IMAGE` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`IMAGE` (
-  `IMAGE_ID` BIGINT NOT NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `IMAGE_NAME` VARCHAR(64) NULL ,
-  `SORT_ORDER_ID` TINYINT NULL ,
-  `REF_ID` BIGINT NULL ,
-  `REF_TYPE` TINYINT NULL ,
-  `IMAGE_FORMAT` TINYINT NULL ,
-  `HOSTED_URL` VARCHAR(1028) NULL ,
-  `HASH` VARCHAR(64) NULL ,
-  `SIZE` VARCHAR(32) NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`IMAGE_ID`) ,
-  INDEX `fk_IMAGE_PRODUCT_VARIATION1_idx` (`REF_ID` ASC) )
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`account_marketplace` (
+  `account_marketplace_id` bigint(20) not null ,
+  `account_id` bigint(20) null default null ,
+  `mp_id` tinyint(4) null default null ,
+  `status` tinyint(4) null default null ,
+  `mp_client_id` varchar(256) null default null ,
+  `mp_client_secret_code` varchar(512) null default null ,
+  `mp_token` varchar(1000) null default null ,
+  `mp_token_expiry_date` datetime null default null ,
+  `mp_token_response` varchar(2000) null default null ,
+  `create_date` datetime null default null ,
+  primary key (`account_marketplace_id`) ,
+  index `fk_account_marketplace_account1_idx` (`account_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_SPECIFICATION`
+-- table `productdb`.`account_subscription`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_SPECIFICATION` ;
+drop table if exists `productdb`.`account_subscription` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_SPECIFICATION` (
-  `PRODUCT_SPECIFICATION_ID` BIGINT NOT NULL ,
-  `PRODUCT_ID` BIGINT NOT NULL ,
-  `WEIGHT_UNIT` TINYINT NULL ,
-  `WEIGHT` DECIMAL(8,2) NULL ,
-  `DIMENSION_UNIT` TINYINT NULL ,
-  `WIDTH` DECIMAL(8,2) NULL ,
-  `LENGTH` DECIMAL(8,2) NULL ,
-  `HEIGHT` DECIMAL(8,2) NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`PRODUCT_SPECIFICATION_ID`) ,
-  INDEX `fk_PRODUCT_SPECIFICATION_MERCHANT_PRODUCT1_idx` (`PRODUCT_ID` ASC) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_ATTRIBUTE`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_ATTRIBUTE` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_ATTRIBUTE` (
-  `PRODUCT_ATTRIBUTE_ID` BIGINT NOT NULL ,
-  `ATTR_NAME` VARCHAR(64) NULL ,
-  `PRODUCT_SPECIFICATION_ID` BIGINT NULL ,
-  `ATTR_CHAR_VALUE` VARCHAR(64) NULL ,
-  `ATTR_NUM_VALUE` DECIMAL(18,4) NULL ,
-  `ATTR_DATE_VALUE` DATETIME NULL ,
-  `ATTR_DATA_TYPE` TINYINT NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  PRIMARY KEY (`PRODUCT_ATTRIBUTE_ID`) ,
-  INDEX `fk_PRODUCT_ATTRIBUTE_PRODUCT_SPECIFICATION1_idx` (`PRODUCT_SPECIFICATION_ID` ASC))
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`account_subscription` (
+  `account_subscription_id` bigint(20) not null ,
+  `account_id` bigint(20) not null ,
+  `subscription_id` int(11) null default null ,
+  `subscription_type` decimal(4,0) null default null comment 'subscription_type is for monthy/yearly subscription' ,
+  `start_date` datetime null default null ,
+  `end_date` datetime null default null ,
+  `modify_date` datetime null default null ,
+  `change_who` varchar(45) null default null ,
+  `create_date` datetime null default null ,
+  `discount_id` int(11) not null ,
+  primary key (`account_subscription_id`) ,
+  index `fk_account_subscription_subscription_detail1_idx` (`subscription_id` asc) ,
+  index `fk_account_subscription_account1_idx` (`account_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_CLASSIFICATION`
+-- table `productdb`.`address`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_CLASSIFICATION` ;
+drop table if exists `productdb`.`address` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_CLASSIFICATION` (
-  `CLASSIFICATION_ID` BIGINT NOT NULL ,
-  `CLASSIFICATION_NAME` VARCHAR(45) NULL ,
-  `MARKET_ID` INT NULL ,
-  `MARKET_REF_ID` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_APP` TINYINT NULL ,
-  PRIMARY KEY (`CLASSIFICATION_ID`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`RETURN_POLICY`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`RETURN_POLICY` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`RETURN_POLICY` (
-  `POLICY_ID` BIGINT NOT NULL ,
-  `POLICY_NAME` VARCHAR(45) NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `RETURN_ADDR_ID` INT NULL ,
-  `PAYER_ID` INT NULL ,
-  `RETURN_DURATION` INT NULL ,
-  `POLICY_DETAILS` VARCHAR(4000) NULL ,
-  `STATUS` TINYINT NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_APP` TINYINT NULL ,
-  PRIMARY KEY (`POLICY_ID`) )
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`address` (
+  `address_id` bigint(20) not null auto_increment ,
+  `use_case` tinyint(4) null default null ,
+  `addr_type` tinyint(4) null default null ,
+  `contact_first_name` varchar(64) null default null ,
+  `contact_last_name` varchar(64) null default null ,
+  `company_name` varchar(64) null default null ,
+  `addr_ln1` varchar(128) null default null ,
+  `addr_ln2` varchar(128) null default null ,
+  `addr_ln3` varchar(128) null default null ,
+  `city` varchar(64) null default null ,
+  `state` varchar(64) null default null ,
+  `country_code_iso3` tinyint(4) null default null ,
+  `zip` varchar(32) null default null ,
+  `status` tinyint(4) null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `account_account_id` bigint(20) not null ,
+  primary key (`address_id`) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`SHIPPING_SERVICE`
+-- table `productdb`.`batch_job`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`SHIPPING_SERVICE` ;
+drop table if exists `productdb`.`batch_job` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`SHIPPING_SERVICE` (
-  `SHIPPING_SERVICE_ID` INT NOT NULL ,
-  `NAME` VARCHAR(45) NULL ,
-  `TYPE` TINYINT NULL ,
-  `SITE` TINYINT NULL ,
-  `STATUS` TINYINT NULL ,
-  `SERVICE_CATEGORY` TINYINT NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  PRIMARY KEY (`SHIPPING_SERVICE_ID`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`SHIPPING_POLICY`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`SHIPPING_POLICY` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`SHIPPING_POLICY` (
-  `POLICY_ID` BIGINT NOT NULL ,
-  `POLICY_NAME` VARCHAR(45) NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `SHIP_TYPE` TINYINT NULL ,
-  `SHIP_SERVICE_ID` INT NULL ,
-  `SHIP_CARRIER_ID` INT NULL ,
-  `COST` DECIMAL(18,4) NULL ,
-  `STATUS` TINYINT NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_APP` TINYINT NULL ,
-  PRIMARY KEY (`POLICY_ID`) ,
-  INDEX `fk_SHIPPING_POLICY_SHIPPING_SERVICE1_idx` (`SHIP_SERVICE_ID` ASC))
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`batch_job` (
+  `batch_job_id` bigint(20) not null ,
+  `account_id` bigint(20) null default null ,
+  `site_id` int(11) null default null ,
+  `file_id` bigint(20) not null ,
+  `file_name` varchar(256) null default null ,
+  `status` tinyint(4) null default null ,
+  `req_location` varchar(512) null default null ,
+  `res_location` varchar(512) null default null ,
+  `seller_notes` varchar(512) null default null ,
+  `usecase` tinyint(4) null default null ,
+  `total_records` bigint(20) null default null ,
+  `processed_records` bigint(20) null default null ,
+  `error_count` bigint(20) null default null ,
+  `create_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  primary key (`batch_job_id`, `file_id`) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`LISTING`
+-- table `productdb`.`batch_work_log`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`LISTING` ;
+drop table if exists `productdb`.`batch_work_log` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`LISTING` (
-  `LISTING_ID` BIGINT NOT NULL ,
-  `TITLE` VARCHAR(45) NULL ,
-  `REF_ID` BIGINT NOT NULL ,
-  `REF_TYPE` TINYINT NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `SHIPPING_POLICY_ID` BIGINT NULL ,
-  `RETURN_POLICY_ID` BIGINT NULL ,
-  `LOCATION_POLICY_ID` BIGINT NULL ,
-  `PRICE` DECIMAL(18,4) NULL ,
-  `QUANTITY` INT NULL ,
-  `CLASIFICATION_ID` BIGINT NULL ,
-  `PRODUCE` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_APP` VARCHAR(45) NULL ,
-  PRIMARY KEY (`LISTING_ID`) ,
-  INDEX `fk_LISTING_MERCHANT_PRODUCT1_idx` (`REF_ID` ASC) ,
-  INDEX `fk_LISTING_RETURN_POLICY1_idx` (`RETURN_POLICY_ID` ASC) ,
-  INDEX `fk_LISTING_SHIPPING_POLICY1_idx` (`SHIPPING_POLICY_ID` ASC))
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`batch_work_log` (
+  `batch_work_log_id` bigint(20) not null ,
+  `batch_id` bigint(20) not null ,
+  `file_id` bigint(20) not null ,
+  `account_id` bigint(20) null default null ,
+  `record_id` bigint(20) null default null ,
+  `request` blob null default null ,
+  `response` blob null default null ,
+  `status` tinyint(4) null default null ,
+  `api_action` varchar(64) null default null ,
+  `site_id` int(11) null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  primary key (`batch_work_log_id`, `batch_id`, `file_id`) ,
+  index `fk_batch_work_log_batch_job1_idx` (`batch_id` asc, `file_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`SUBSCRIPTION_DETAIL`
+-- table `productdb`.`image`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`SUBSCRIPTION_DETAIL` ;
+drop table if exists `productdb`.`image` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`SUBSCRIPTION_DETAIL` (
-  `SUBSCRIPTION_ID` DECIMAL(18) NOT NULL ,
-  `SUBSCRIPTION_NAME` VARCHAR(64) NULL ,
-  `DESCRIPTION_CODE` DECIMAL(18) NULL ,
-  `MODIFY_DATE` DATETIME NULL ,
-  `CHANGE_WHO` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`SUBSCRIPTION_ID`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`ACCOUNT_SUBSCRIPTION`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`ACCOUNT_SUBSCRIPTION` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`ACCOUNT_SUBSCRIPTION` (
-  `ACCOUNT_SUBSCRIPTION_ID` DECIMAL(18) NOT NULL ,
-  `ACCOUNT_ID` DECIMAL(18) NOT NULL ,
-  `SUBSCRIPTION_ID` DECIMAL(18) NULL ,
-  `SUBSCRIPTION_TYPE` DECIMAL(4) NULL ,
-  `START_DATE` DATETIME NULL ,
-  `END_DATE` DATETIME NULL ,
-  `MODIFY_DATE` DATETIME NULL ,
-  `CHANGE_WHO` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`ACCOUNT_SUBSCRIPTION_ID`, `ACCOUNT_ID`) ,
-  INDEX `fk_ACCOUNT_SUBSCRIPTION_SUBSCRIPTION_DETAIL1_idx` (`SUBSCRIPTION_ID` ASC) )
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`image` (
+  `image_id` bigint(20) not null ,
+  `account_id` bigint(20) null default null ,
+  `image_name` varchar(64) null default null ,
+  `sort_order_id` tinyint(4) null default null ,
+  `ref_id` bigint(20) null default null ,
+  `ref_type` tinyint(4) null default null ,
+  `image_format` tinyint(4) null default null ,
+  `hosted_url` varchar(1028) null default null ,
+  `hash` varchar(64) null default null ,
+  `size` varchar(32) null default null ,
+  `last_modified_date` datetime null default null ,
+  `create_date` datetime null default null ,
+  primary key (`image_id`) ,
+  index `fk_image_product_variation1_idx` (`ref_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`BATCH_JOB`
+-- table `productdb`.`listing`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`BATCH_JOB` ;
+drop table if exists `productdb`.`listing` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`BATCH_JOB` (
-  `BATCH_JOB_ID` BIGINT NOT NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `SITE_ID` INT NULL ,
-  `FILE_ID` BIGINT NOT NULL ,
-  `FILE_NAME` VARCHAR(256) NULL ,
-  `STATUS` TINYINT NULL ,
-  `REQ_LOCATION` VARCHAR(512) NULL ,
-  `RES_LOCATION` VARCHAR(512) NULL ,
-  `SELLER_NOTES` VARCHAR(512) NULL ,
-  `USECASE` TINYINT NULL ,
-  `TOTAL_RECORDS` BIGINT NULL ,
-  `PROCESSED_RECORDS` BIGINT NULL ,
-  `ERROR_COUNT` BIGINT NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  PRIMARY KEY (`BATCH_JOB_ID`, `FILE_ID`) )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`BATCH_WORK_LOG`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`BATCH_WORK_LOG` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`BATCH_WORK_LOG` (
-  `BATCH_WORK_LOG_ID` BIGINT NOT NULL ,
-  `BATCH_ID` BIGINT NOT NULL ,
-  `FILE_ID` BIGINT NOT NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `RECORD_ID` BIGINT NULL ,
-  `REQUEST` BLOB NULL ,
-  `RESPONSE` BLOB NULL ,
-  `STATUS` TINYINT NULL ,
-  `API_ACTION` VARCHAR(64) NULL ,
-  `SITE_ID` INT NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL ,
-  PRIMARY KEY (`BATCH_WORK_LOG_ID`, `BATCH_ID`, `FILE_ID`) ,
-  INDEX `fk_BATCH_WORK_LOG_BATCH_JOB1_idx` (`BATCH_ID` ASC, `FILE_ID` ASC) )
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`listing` (
+  `listing_id` bigint(20) not null ,
+  `title` varchar(45) null default null ,
+  `ref_id` bigint(20) not null ,
+  `ref_type` tinyint(4) null default null ,
+  `account_id` bigint(20) null default null ,
+  `shipping_policy_id` bigint(20) null default null ,
+  `return_policy_id` bigint(20) null default null ,
+  `location_policy_id` bigint(20) null default null ,
+  `price` decimal(18,4) null default null ,
+  `quantity` int(11) null default null ,
+  `clasification_id` bigint(20) null default null ,
+  `produce` varchar(45) null default null ,
+  `create_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` varchar(45) null default null ,
+  primary key (`listing_id`) ,
+  index `fk_listing_merchant_product1_idx` (`ref_id` asc) ,
+  index `fk_listing_return_policy1_idx` (`return_policy_id` asc) ,
+  index `fk_listing_shipping_policy1_idx` (`shipping_policy_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `PRODUCTDB`.`PRODUCT_VARIATION_DETAILS`
+-- table `productdb`.`merchant_product`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`PRODUCT_VARIATION_DETAILS` ;
+drop table if exists `productdb`.`merchant_product` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`PRODUCT_VARIATION_DETAILS` (
-  `PRODUCT_VARIATION_DETAILS_ID` BIGINT NOT NULL ,
-  `PRODUCT_VARIATION_ID` BIGINT NULL ,
-  `VARIATION_NAME` VARCHAR(45) NULL ,
-  `VARIATION_VALUES` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`PRODUCT_VARIATION_DETAILS_ID`) ,
-  INDEX `fk_PRODUCT_VARIATION_DETAILS_PRODUCT_VARIATION1_idx` (`PRODUCT_VARIATION_ID` ASC))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PRODUCTDB`.`ADDRESS`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`ADDRESS` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`ADDRESS` (
-  `ADDRESS_ID` BIGINT NOT NULL AUTO_INCREMENT ,
-  `USE_CASE` TINYINT NULL ,
-  `ADDR_TYPE` TINYINT NULL ,
-  `CONTACT_FIRST_NAME` VARCHAR(64) NULL ,
-  `CONTACT_LAST_NAME` VARCHAR(64) NULL ,
-  `COMPANY_NAME` VARCHAR(64) NULL ,
-  `ADDR_LN1` VARCHAR(128) NULL ,
-  `ADDR_LN2` VARCHAR(128) NULL ,
-  `ADDR_LN3` VARCHAR(128) NULL ,
-  `CITY` VARCHAR(64) NULL ,
-  `STATE` VARCHAR(64) NULL ,
-  `COUNTRY_CODE_ISO3` TINYINT NULL ,
-  `ZIP` VARCHAR(32) NULL ,
-  `STATUS` TINYINT NULL ,
-  `CREATED_DATE` DATETIME NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL DEFAULT NULL ,
-  `ACCOUNT_ACCOUNT_ID` BIGINT NOT NULL ,
-  PRIMARY KEY (`ADDRESS_ID`) )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
+create  table if not exists `productdb`.`merchant_product` (
+  `merchant_product_id` bigint(20) not null auto_increment ,
+  `title` varchar(256) null default null ,
+  `sku` varchar(64) null default null ,
+  `account_id` bigint(20) null default null ,
+  `product_code` varchar(64) null default null ,
+  `product_code_type` tinyint(4) null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` tinyint(4) null default null ,
+  primary key (`merchant_product_id`) )
+engine = innodb
+auto_increment = 5
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `stool`.`ACCOUNT`
+-- table `productdb`.`product_attribute`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`ACCOUNT` ;
+drop table if exists `productdb`.`product_attribute` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`ACCOUNT` (
-  `ACCOUNT_ID` BIGINT NOT NULL AUTO_INCREMENT ,
-  `EMAIL_ADDR` VARCHAR(256) NULL ,
-  `SALT` VARCHAR(4000) NULL DEFAULT NULL ,
-  `PASSWORD` VARCHAR(4000) NULL DEFAULT NULL ,
-  `FIRST_NAME` VARCHAR(64) NULL DEFAULT NULL ,
-  `LAST_NAME` VARCHAR(64) NULL DEFAULT NULL ,
-  `MIDDLE_NAME` VARCHAR(64) NULL DEFAULT NULL ,
-  `ACCOUNT_IMAGE` BLOB NULL ,
-  `REGISTRATION_ADDR_ID` BIGINT NOT NULL ,
-  `BILLING_ADDR_ID` BIGINT NOT NULL ,
-  `STATUS` TINYINT NULL ,
-  `REGISTERED_COUNTRY` INT NULL DEFAULT NULL ,
-  `LOCALE_ISO3` TINYINT NULL DEFAULT NULL ,
-  `CURRENCY_CODE_ISO3` TINYINT NULL DEFAULT NULL ,
-  `CREATED_DATE` DATETIME NULL DEFAULT NULL ,
-  `LAST_MODIFIED_DATE` DATETIME NULL DEFAULT NULL ,
-  `LAST_MODIFIED_APP` TINYINT NULL DEFAULT NULL ,
-  PRIMARY KEY (`ACCOUNT_ID`) ,
-  UNIQUE INDEX `EMAIL_ADDR_UNIQUE` (`EMAIL_ADDR` ASC) ,
-  INDEX `fk_ACCOUNT_ADDRESS1_idx` (`REGISTRATION_ADDR_ID` ASC) ,
-  INDEX `fk_ACCOUNT_ADDRESS2_idx` (`BILLING_ADDR_ID` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8;
-
--- -----------------------------------------------------
--- Table `ACCOUNTDB`.`ACCOUNT_SUBSCRIPTION`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`ACCOUNT_SUBSCRIPTION` ;
-
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`ACCOUNT_SUBSCRIPTION` (
-  `ACCOUNT_SUBSCRIPTION_ID` BIGINT NOT NULL ,
-  `ACCOUNT_ID` BIGINT NOT NULL ,
-  `SUBSCRIPTION_ID` INT NULL ,
-  `SUBSCRIPTION_TYPE` DECIMAL(4) NULL COMMENT 'SUBSCRIPTION_TYPE is for MOnthy/Yearly subscription' ,
-  `START_DATE` DATETIME NULL ,
-  `END_DATE` DATETIME NULL ,
-  `MODIFY_DATE` DATETIME NULL ,
-  `CHANGE_WHO` VARCHAR(45) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  `DISCOUNT_ID` INT NOT NULL ,
-  PRIMARY KEY (`ACCOUNT_SUBSCRIPTION_ID`) ,
-  INDEX `fk_ACCOUNT_SUBSCRIPTION_SUBSCRIPTION_DETAIL1_idx` (`SUBSCRIPTION_ID` ASC) ,
-  INDEX `fk_ACCOUNT_SUBSCRIPTION_ACCOUNT1_idx` (`ACCOUNT_ID` ASC))
-ENGINE = InnoDB;
+create  table if not exists `productdb`.`product_attribute` (
+  `product_attribute_id` bigint(20) not null ,
+  `attr_name` varchar(64) null default null ,
+  `product_specification_id` bigint(20) null default null ,
+  `attr_char_value` varchar(64) null default null ,
+  `attr_num_value` decimal(18,4) null default null ,
+  `attr_date_value` datetime null default null ,
+  `attr_data_type` tinyint(4) null default null ,
+  `last_modified_date` datetime null default null ,
+  `created_date` datetime null default null ,
+  primary key (`product_attribute_id`) ,
+  index `fk_product_attribute_product_specification1_idx` (`product_specification_id` asc) )
+engine = innodb
+default character set = utf8;
 
 
 -- -----------------------------------------------------
--- Table `ACCOUNTDB`.`ACCOUNT_MARKETPLACE`
+-- table `productdb`.`product_classification`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `PRODUCTDB`.`ACCOUNT_MARKETPLACE` ;
+drop table if exists `productdb`.`product_classification` ;
 
-CREATE  TABLE IF NOT EXISTS `PRODUCTDB`.`ACCOUNT_MARKETPLACE` (
-  `ACCOUNT_MARKETPLACE_ID` BIGINT NOT NULL ,
-  `ACCOUNT_ID` BIGINT NULL ,
-  `MP_ID` TINYINT NULL ,
-  `STATUS` TINYINT NULL ,
-  `MP_CLIENT_ID` VARCHAR(256) NULL ,
-  `MP_CLIENT_SECRET_CODE` VARCHAR(512) NULL ,
-  `MP_TOKEN` VARCHAR(1000) NULL ,
-  `CREATE_DATE` DATETIME NULL ,
-  PRIMARY KEY (`ACCOUNT_MARKETPLACE_ID`) ,
-  INDEX `fk_ACCOUNT_MARKETPLACE_ACCOUNT1_idx` (`ACCOUNT_ID` ASC) )
-ENGINE = InnoDB;
-
-
-USE `PRODUCTDB` ;
+create  table if not exists `productdb`.`product_classification` (
+  `classification_id` bigint(20) not null ,
+  `classification_name` varchar(45) null default null ,
+  `market_id` int(11) null default null ,
+  `market_ref_id` varchar(45) null default null ,
+  `create_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` tinyint(4) null default null ,
+  primary key (`classification_id`) )
+engine = innodb
+default character set = utf8;
 
 
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+-- -----------------------------------------------------
+-- table `productdb`.`product_description`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`product_description` ;
+
+create  table if not exists `productdb`.`product_description` (
+  `product_description_id` bigint(20) not null ,
+  `description_name` varchar(64) null default null ,
+  `product_id` bigint(20) not null ,
+  `description_text` text null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  primary key (`product_description_id`) ,
+  index `fk_merchant_product_description_merchant_product1_idx` (`product_id` asc) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`product_specification`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`product_specification` ;
+
+create  table if not exists `productdb`.`product_specification` (
+  `product_specification_id` bigint(20) not null ,
+  `product_id` bigint(20) not null ,
+  `weight_unit` tinyint(4) null default null ,
+  `weight` decimal(8,2) null default null ,
+  `dimension_unit` tinyint(4) null default null ,
+  `width` decimal(8,2) null default null ,
+  `length` decimal(8,2) null default null ,
+  `height` decimal(8,2) null default null ,
+  `last_modified_date` datetime null default null ,
+  `create_date` datetime null default null ,
+  primary key (`product_specification_id`) ,
+  index `fk_product_specification_merchant_product1_idx` (`product_id` asc) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`product_variation`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`product_variation` ;
+
+create  table if not exists `productdb`.`product_variation` (
+  `product_variations_id` bigint(20) not null ,
+  `product_id` bigint(20) null default null ,
+  `availble_quantity` int(11) null default null ,
+  `price` decimal(18,4) null default null ,
+  `last_modified_date` datetime null default null ,
+  `create_date` datetime null default null ,
+  primary key (`product_variations_id`) ,
+  index `fk_product_variation_merchant_product1_idx` (`product_id` asc) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`product_variation_details`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`product_variation_details` ;
+
+create  table if not exists `productdb`.`product_variation_details` (
+  `product_variation_details_id` bigint(20) not null ,
+  `product_variation_id` bigint(20) null default null ,
+  `variation_name` varchar(45) null default null ,
+  `variation_values` varchar(45) null default null ,
+  `create_date` datetime null default null ,
+  primary key (`product_variation_details_id`) ,
+  index `fk_product_variation_details_product_variation1_idx` (`product_variation_id` asc) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`return_policy`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`return_policy` ;
+
+create  table if not exists `productdb`.`return_policy` (
+  `policy_id` bigint(20) not null ,
+  `policy_name` varchar(45) null default null ,
+  `account_id` bigint(20) null default null ,
+  `return_addr_id` int(11) null default null ,
+  `payer_id` int(11) null default null ,
+  `return_duration` int(11) null default null ,
+  `policy_details` varchar(4000) null default null ,
+  `status` tinyint(4) null default null ,
+  `create_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` tinyint(4) null default null ,
+  primary key (`policy_id`) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`shipping_policy`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`shipping_policy` ;
+
+create  table if not exists `productdb`.`shipping_policy` (
+  `policy_id` bigint(20) not null ,
+  `policy_name` varchar(45) null default null ,
+  `account_id` bigint(20) null default null ,
+  `ship_type` tinyint(4) null default null ,
+  `ship_service_id` int(11) null default null ,
+  `ship_carrier_id` int(11) null default null ,
+  `cost` decimal(18,4) null default null ,
+  `status` tinyint(4) null default null ,
+  `create_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  `last_modified_app` tinyint(4) null default null ,
+  primary key (`policy_id`) ,
+  index `fk_shipping_policy_shipping_service1_idx` (`ship_service_id` asc) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`shipping_service`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`shipping_service` ;
+
+create  table if not exists `productdb`.`shipping_service` (
+  `shipping_service_id` int(11) not null ,
+  `name` varchar(45) null default null ,
+  `type` tinyint(4) null default null ,
+  `site` tinyint(4) null default null ,
+  `status` tinyint(4) null default null ,
+  `service_category` tinyint(4) null default null ,
+  `created_date` datetime null default null ,
+  `last_modified_date` datetime null default null ,
+  primary key (`shipping_service_id`) )
+engine = innodb
+default character set = utf8;
+
+
+-- -----------------------------------------------------
+-- table `productdb`.`subscription_detail`
+-- -----------------------------------------------------
+drop table if exists `productdb`.`subscription_detail` ;
+
+create  table if not exists `productdb`.`subscription_detail` (
+  `subscription_id` decimal(18,0) not null ,
+  `subscription_name` varchar(64) null default null ,
+  `description_code` decimal(18,0) null default null ,
+  `modify_date` datetime null default null ,
+  `change_who` varchar(45) null default null ,
+  `create_date` datetime null default null ,
+  primary key (`subscription_id`) )
+engine = innodb
+default character set = utf8;
+
+use `productdb` ;
+
+
+set sql_mode=@old_sql_mode;
+set foreign_key_checks=@old_foreign_key_checks;
+set unique_checks=@old_unique_checks;
