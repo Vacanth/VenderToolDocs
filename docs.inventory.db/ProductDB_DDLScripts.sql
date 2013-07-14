@@ -50,7 +50,7 @@ create  table if not exists `productdb`.`account_marketplace` (
   `mp_client_id` varchar(256) null default null ,
   `mp_client_secret_code` varchar(512) null default null ,
   `mp_token` varchar(1000) null default null ,
-  `mp_token_expiry_date` datetime null default null ,
+  `token_expiry_date` datetime null default null ,
   `mp_token_response` varchar(2000) null default null ,
   `create_date` datetime null default null ,
   primary key (`account_marketplace_id`) ,
