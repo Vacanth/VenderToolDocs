@@ -339,13 +339,16 @@ drop table if exists `productdb`.`product_variation_details` ;
 create  table if not exists `productdb`.`product_variation_details` (
   `product_variation_details_id` bigint(20) not null ,
   `product_variation_id` bigint(20) null default null ,
+  `product_id` bigint(20) null default null ,
   `variation_name` varchar(45) null default null ,
   `variation_values` varchar(45) null default null ,
   `create_date` datetime null default null ,
   primary key (`product_variation_details_id`) ,
-  index `fk_product_variation_details_product_variation1_idx` (`product_variation_id` asc) )
+  index `fk_product_variation_details_product_variation1_idx` (`product_variation_id` asc) ,
+index `fk_product_variation_merchant_product1_idx` (`product_id` asc) )
 engine = innodb
 default character set = utf8;
+
 
 
 -- -----------------------------------------------------
