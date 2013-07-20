@@ -131,9 +131,11 @@ create  table if not exists `productdb`.`batch_job` (
   `error_count` bigint(20) null default null ,
   `create_date` datetime null default null ,
   `last_modified_date` datetime null default null ,
-  primary key (`batch_job_id`, `file_id`) )
+  primary key (`batch_job_id`) )
 engine = innodb
+auto_increment = 1
 default character set = utf8;
+
 
 
 -- -----------------------------------------------------
