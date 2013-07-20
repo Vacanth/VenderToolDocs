@@ -143,7 +143,7 @@ drop table if exists `productdb`.`batch_work_log` ;
 
 create  table if not exists `productdb`.`batch_work_log` (
   `batch_work_log_id` bigint(20) not null ,
-  `batch_id` bigint(20) not null ,
+  `batch_id` bigint(20)  not null ,
   `file_id` bigint(20) not null ,
   `account_id` bigint(20) null default null ,
   `record_id` bigint(20) null default null ,
@@ -154,9 +154,10 @@ create  table if not exists `productdb`.`batch_work_log` (
   `site_id` int(11) null default null ,
   `created_date` datetime null default null ,
   `last_modified_date` datetime null default null ,
-  primary key (`batch_work_log_id`, `batch_id`, `file_id`) ,
+  primary key (`batch_work_log_id`) ,
   index `fk_batch_work_log_batch_job1_idx` (`batch_id` asc, `file_id` asc) )
 engine = innodb
+auto_increment = 1
 default character set = utf8;
 
 
